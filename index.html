@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>کدستان | پک کامل برنامه‌نویس</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#021a1f; --bg2:#042a31; --card:#06343c;
+    --t1:#1de9d1; --t2:#00bfa5; --t3:#7ff5e6; --gold:#f2c76e;
+    --text:#e6fffb; --muted:#8fc9c2; --line:rgba(29,233,209,.22);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:"Vazirmatn","Segoe UI",Tahoma,system-ui,sans-serif;
+    overflow-x:hidden; line-height:1.9;
+  }
+  /* الگوی کاشی ایرانی (ستاره هشت‌پر) */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cg fill='none' stroke='%231de9d1' stroke-opacity='.10' stroke-width='1.2'%3E%3Crect x='20' y='20' width='50' height='50'/%3E%3Crect x='20' y='20' width='50' height='50' transform='rotate(45 45 45)'/%3E%3Ccircle cx='45' cy='45' r='9'/%3E%3C/g%3E%3C/svg%3E");
+    animation:drift 60s linear infinite;
+  }
+  @keyframes drift{to{background-position:90px 90px}}
+  canvas#fx{position:fixed; inset:0; z-index:0; pointer-events:none}
+  main,.hero,.site-foot{position:relative; z-index:1}
+ 
+  /* ناوبری */
+  nav{
+    position:fixed; top:14px; left:0; right:0; margin:0 auto; width:max-content; max-width:94vw;
+    display:flex; gap:6px; align-items:center; padding:8px 12px; z-index:50;
+    border-radius:999px; background:rgba(3,40,47,.65); border:1px solid var(--line);
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+  }
+  nav .brand{display:flex; align-items:center; gap:8px; font-weight:800; color:var(--t1); padding:0 10px}
+  nav a{color:var(--text); text-decoration:none; font-size:14px; padding:6px 14px; border-radius:999px; transition:.25s; white-space:nowrap}
+  nav a:hover{background:rgba(29,233,209,.16); color:var(--t3)}
+  @media(max-width:640px){nav a.hide-sm{display:none}}
+ 
+  /* بخش‌ها */
+  section{padding:90px 20px; max-width:1180px; margin:0 auto}
+  .sec-title{text-align:center; margin-bottom:40px}
+  .sec-title h2{margin:0; font-size:clamp(26px,4vw,40px); font-weight:800;
+    background:linear-gradient(90deg,var(--t3),var(--t1),var(--t2)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .sec-title p{color:var(--muted); margin:8px 0 0}
+  .divider{display:flex; justify-content:center; margin:14px 0 0}
+  .stairs{height:14px; width:200px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='14'%3E%3Cpath d='M0 14V10h4V6h4V2h4V0h4v2h4v4h4v4h4v4z' fill='%231de9d1' fill-opacity='.7'/%3E%3C/svg%3E");
+    background-repeat:repeat-x}
+  .reveal{opacity:0; transform:translateY(40px); transition:opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1; transform:none}
+ 
+  /* قهرمان */
+  .hero{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding-top:110px}
+  .emblem{position:relative; width:min(340px,70vw); aspect-ratio:1; display:grid; place-items:center; margin-bottom:10px}
+  .rosette{position:absolute; inset:0; width:100%; height:100%; animation:spin 40s linear infinite; filter:drop-shadow(0 0 18px rgba(29,233,209,.45))}
+  .rosette.r2{inset:12%; width:76%; height:76%; animation-duration:28s; animation-direction:reverse; opacity:.8}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .fv{width:62%; height:auto; animation:float 5s ease-in-out infinite; filter:drop-shadow(0 0 14px rgba(29,233,209,.7))}
+  @keyframes float{50%{transform:translateY(-12px)}}
+  .hero h1{margin:6px 0; font-size:clamp(34px,7vw,72px); font-weight:800; line-height:1.3;
+    background:linear-gradient(90deg,#fff,var(--t1),var(--t2)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .hero .sub{color:var(--muted); font-size:clamp(15px,2.2vw,20px); max-width:640px; margin:0 auto 18px}
+  .typer{direction:ltr; font-family:Consolas,Menlo,monospace; color:var(--t1); background:rgba(0,0,0,.35); border:1px solid var(--line);
+    padding:10px 18px; border-radius:12px; min-height:46px; display:inline-block; min-width:min(380px,88vw); text-align:left}
+  .typer::after{content:"▍"; animation:blink 1s steps(2) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .stats{display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:28px}
+  .stat{padding:12px 22px; border-radius:16px; background:rgba(6,52,60,.7); border:1px solid var(--line); min-width:120px}
+  .stat b{display:block; font-size:28px; color:var(--t1)}
+  .stat span{font-size:13px; color:var(--muted)}
+  .btn{display:inline-block; border:0; cursor:pointer; font:inherit; font-weight:700; padding:12px 28px; border-radius:999px; text-decoration:none;
+    color:#022; background:linear-gradient(90deg,var(--t1),var(--t2)); box-shadow:0 8px 26px rgba(29,233,209,.35); transition:.3s}
+  .btn:hover{transform:translateY(-3px) scale(1.03)}
+  .btn.ghost{background:transparent; color:var(--t1); border:1px solid var(--t1); box-shadow:none}
+ 
+  /* کارت‌های زبان (چرخشی) */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:22px}
+  .lang{perspective:1000px; height:330px; cursor:pointer}
+  .inner{position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+  .lang.flip .inner{transform:rotateY(180deg)}
+  @media(hover:hover){.lang:hover .inner{transform:rotateY(180deg)}}
+  .face{position:absolute; inset:0; border-radius:22px; padding:18px; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    border:1px solid var(--line); overflow:hidden}
+  .front{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    background:linear-gradient(160deg,var(--card),#032026)}
+  .front::before{content:""; position:absolute; inset:-40%; background:conic-gradient(from 0deg,transparent,rgba(29,233,209,.16),transparent 30%); animation:spin 9s linear infinite}
+  .ico{position:relative; width:104px; height:104px; border-radius:26px; display:grid; place-items:center;
+    background:rgba(255,255,255,.93); box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .ico img{width:68px; height:68px}
+  .ico span{font-weight:800; font-size:26px; color:#044}
+  .front h3{position:relative; margin:0; font-size:22px; direction:ltr}
+  .front small{position:relative; color:var(--muted)}
+  .back{transform:rotateY(180deg); background:linear-gradient(160deg,#07434d,#032a31); overflow:auto; font-size:13.5px}
+  .back h4{margin:0 0 4px; color:var(--t1); font-size:17px; direction:ltr; text-align:right}
+  .back p{margin:4px 0 8px; color:var(--text); line-height:1.8}
+  .tags{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:8px}
+  .tag{font-size:11.5px; padding:1px 9px; border-radius:999px; background:rgba(29,233,209,.14); color:var(--t3); border:1px solid var(--line)}
+  .lvl{height:6px; border-radius:6px; background:rgba(255,255,255,.12); margin:4px 0 8px; overflow:hidden}
+  .lvl i{display:block; height:100%; background:linear-gradient(90deg,var(--t1),var(--gold)); border-radius:6px}
+  pre.mini{direction:ltr; text-align:left; margin:0 0 10px; padding:8px 10px; background:rgba(0,0,0,.4); border-radius:10px;
+    font-size:11.5px; line-height:1.6; overflow:auto; color:var(--t3); font-family:Consolas,Menlo,monospace}
+  .back .btn{padding:7px 18px; font-size:13px}
+ 
+  /* کتابخانه کد */
+  .tools{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:22px}
+  .search{flex:1 1 300px; max-width:440px; padding:12px 20px; border-radius:999px; border:1px solid var(--line); outline:0;
+    background:rgba(6,52,60,.7); color:var(--text); font:inherit}
+  .search:focus{border-color:var(--t1); box-shadow:0 0 0 3px rgba(29,233,209,.2)}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:26px}
+  .chip{cursor:pointer; border:1px solid var(--line); background:rgba(6,52,60,.6); color:var(--text); font:inherit; font-size:13px;
+    padding:5px 16px; border-radius:999px; transition:.25s; direction:ltr}
+  .chip:hover,.chip.on{background:var(--t1); color:#022; border-color:var(--t1)}
+  .snips{display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:18px}
+  .snip{background:linear-gradient(160deg,var(--card),#032329); border:1px solid var(--line); border-radius:18px; overflow:hidden;
+    transition:.3s; animation:pop .5s both}
+  @keyframes pop{from{opacity:0; transform:scale(.94) translateY(10px)}}
+  .snip:hover{transform:translateY(-5px); border-color:var(--t1); box-shadow:0 14px 34px rgba(29,233,209,.15)}
+  .snip header{display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(0,0,0,.25)}
+  .snip header img{width:24px; height:24px; background:#fff; border-radius:6px; padding:2px}
+  .snip header b{flex:1; font-size:14.5px}
+  .snip header em{font-style:normal; font-size:11.5px; color:var(--gold)}
+  .snip pre{margin:0; padding:14px; direction:ltr; text-align:left; font-size:12.5px; line-height:1.65; overflow:auto; max-height:230px;
+    font-family:Consolas,Menlo,monospace; color:#bff9f1}
+  .snip footer{display:flex; justify-content:space-between; align-items:center; padding:8px 14px; font-size:12px; color:var(--muted)}
+  .copy{cursor:pointer; border:1px solid var(--t1); background:transparent; color:var(--t1); font:inherit; font-size:12px; padding:3px 14px; border-radius:999px; transition:.25s}
+  .copy:hover{background:var(--t1); color:#022}
+  .empty{grid-column:1/-1; text-align:center; color:var(--muted); padding:30px}
+ 
+  /* هوش مصنوعی */
+  .ai{max-width:820px; margin:0 auto; border-radius:26px; border:1px solid var(--line); overflow:hidden;
+    background:linear-gradient(170deg,rgba(6,52,60,.9),rgba(2,26,31,.95)); box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .ai-head{display:flex; align-items:center; gap:12px; padding:14px 20px; background:rgba(0,0,0,.28); border-bottom:1px solid var(--line)}
+  .ai-head .dot{width:12px; height:12px; border-radius:50%; background:var(--t1); box-shadow:0 0 12px var(--t1); animation:pulse 2s infinite}
+  @keyframes pulse{50%{opacity:.35}}
+  .ai-head small{color:var(--muted); margin-right:auto}
+  .msgs{height:380px; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:12px}
+  .m{max-width:85%; padding:10px 16px; border-radius:18px; animation:pop .4s both; white-space:pre-wrap}
+  .m.bot{align-self:flex-start; background:rgba(29,233,209,.12); border:1px solid var(--line); border-top-right-radius:4px}
+  .m.me{align-self:flex-end; background:linear-gradient(90deg,var(--t1),var(--t2)); color:#022; font-weight:500; border-top-left-radius:4px}
+  .m pre{direction:ltr; text-align:left; background:rgba(0,0,0,.45); padding:10px 12px; border-radius:10px; margin:8px 0 0;
+    font-size:12.5px; white-space:pre; overflow:auto; color:#bff9f1; font-family:Consolas,Menlo,monospace}
+  .dots span{display:inline-block; width:7px; height:7px; margin:0 2px; border-radius:50%; background:var(--t1); animation:bounce 1s infinite}
+  .dots span:nth-child(2){animation-delay:.15s} .dots span:nth-child(3){animation-delay:.3s}
+  @keyframes bounce{50%{transform:translateY(-6px)}}
+  .sugs{display:flex; flex-wrap:wrap; gap:8px; padding:0 18px 12px}
+  .sugs button{cursor:pointer; font:inherit; font-size:12.5px; padding:4px 14px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--t3); transition:.25s}
+  .sugs button:hover{background:rgba(29,233,209,.16)}
+  .ask{display:flex; gap:10px; padding:14px 18px; border-top:1px solid var(--line)}
+  .ask input{flex:1; padding:12px 18px; border-radius:999px; border:1px solid var(--line); outline:0; background:rgba(0,0,0,.3); color:var(--text); font:inherit}
+  .ask input:focus{border-color:var(--t1)}
+ 
+  /* مسیر یادگیری */
+  .road{position:relative; max-width:760px; margin:0 auto; padding-right:34px}
+  .road::before{content:""; position:absolute; right:12px; top:0; bottom:0; width:3px; background:linear-gradient(var(--t1),transparent)}
+  .step{position:relative; margin-bottom:26px; padding:16px 22px; border-radius:18px; background:rgba(6,52,60,.7); border:1px solid var(--line); transition:.3s}
+  .step:hover{transform:translateX(-8px); border-color:var(--t1)}
+  .step::before{content:attr(data-n); position:absolute; right:-34px; top:16px; width:28px; height:28px; border-radius:50%;
+    display:grid; place-items:center; background:var(--t1); color:#022; font-weight:800; font-size:13px; box-shadow:0 0 16px var(--t1)}
+  .step h3{margin:0 0 4px; color:var(--t1)}
+  .step p{margin:0; color:var(--muted); font-size:14.5px}
+ 
+  .site-foot{text-align:center; padding:50px 20px 70px; color:var(--muted); border-top:1px solid var(--line)}
+  .site-foot svg{width:46px; height:auto; opacity:.8}
+  ::-webkit-scrollbar{width:8px; height:8px}
+  ::-webkit-scrollbar-thumb{background:rgba(29,233,209,.35); border-radius:8px}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+ 
+<nav>
+  <span class="brand"><svg width="22" height="22" viewBox="-50 -50 100 100"><use href="#rosetteSym"/></svg> کدستان</span>
+  <a href="#langs">زبان‌ها</a>
+  <a href="#codes">کدها</a>
+  <a href="#ai">دستیار هوشمند</a>
+  <a href="#road" class="hide-sm">مسیر یادگیری</a>
+</nav>
+ 
+<!-- نمادهای SVG مشترک -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="rosetteSym" viewBox="-50 -50 100 100">
+      <g fill="none" stroke="#1de9d1" stroke-width="1.6">
+        <circle r="8"/><circle r="46" stroke-opacity=".6"/>
+        <g id="petals"></g>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+ 
+<header class="hero" id="top">
+  <div class="emblem">
+    <svg class="rosette" viewBox="-50 -50 100 100" id="ros1"></svg>
+    <svg class="rosette r2" viewBox="-50 -50 100 100" id="ros2"></svg>
+    <!-- فروهر (نماد ایران باستان) -->
+    <svg class="fv" viewBox="0 0 220 150" fill="none" stroke="#7ff5e6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="110" cy="84" r="15" stroke-width="3.5"/>
+      <circle cx="110" cy="84" r="8" stroke-width="2" stroke-opacity=".6"/>
+      <circle cx="110" cy="40" r="9" stroke-width="3"/>
+      <path d="M110 50v20M100 54c-6 8-8 16-8 26M120 54c6 8 8 16 8 26" stroke-width="3"/>
+      <path d="M100 38c0-10 6-16 10-18 4 2 10 8 10 18" stroke-width="2.5"/>
+      <g stroke-width="3">
+        <path d="M96 76C80 70 58 70 30 64"/><path d="M94 82C76 78 54 80 22 76"/>
+        <path d="M95 89C78 88 58 92 30 90"/><path d="M96 96C82 98 66 104 46 106"/>
+        <path d="M124 76C140 70 162 70 190 64"/><path d="M126 82C144 78 166 80 198 76"/>
+        <path d="M125 89C142 88 162 92 190 90"/><path d="M124 96C138 98 154 104 174 106"/>
+      </g>
+      <g stroke-width="2" stroke-opacity=".75">
+        <path d="M30 64c-6 2-10 6-12 12M22 76c-6 3-8 8-8 14M30 90c-5 3-6 8-5 13M46 106c-4 3-4 7-2 11"/>
+        <path d="M190 64c6 2 10 6 12 12M198 76c6 3 8 8 8 14M190 90c5 3 6 8 5 13M174 106c4 3 4 7 2 11"/>
+      </g>
+      <path d="M100 104l-14 34M110 99v42M120 104l14 34" stroke-width="3.5"/>
+      <path d="M95 112l-18 20M125 112l18 20" stroke-width="2.5" stroke-opacity=".7"/>
+    </svg>
+  </div>
+  <h1>کدستان؛ پک کامل برنامه‌نویس</h1>
+  <p class="sub">زبان‌ها را لمس کن، کدهای آماده را بردار و از دستیار هوشمند بپرس؛ همه‌چیز برای شروع برنامه‌نویسی، در یک‌جا.</p>
+  <div class="typer" id="typer"></div>
+  <div class="stats">
+    <div class="stat"><b id="sLang">0</b><span>زبان برنامه‌نویسی</span></div>
+    <div class="stat"><b id="sCode">0</b><span>کد آماده</span></div>
+    <div class="stat"><b id="sQA">0</b><span>پرسش و پاسخ</span></div>
+  </div>
+  <p style="margin-top:28px"><a class="btn" href="#langs">شروع یادگیری</a> &nbsp; <a class="btn ghost" href="#ai">از هوش مصنوعی بپرس</a></p>
+</header>
+ 
+<main>
+  <section id="langs">
+    <div class="sec-title reveal"><h2>زبان‌های برنامه‌نویسی</h2><p>روی هر کارت نگه دار (یا در موبایل لمس کن) تا باز شود</p><div class="divider"><div class="stairs"></div></div></div>
+    <div class="grid" id="langGrid"></div>
+  </section>
+ 
+  <section id="codes">
+    <div class="sec-title reveal"><h2>کتابخانه کدهای آماده</h2><p>جستجو کن، فیلتر کن و با یک کلیک کپی کن</p><div class="divider"><div class="stairs"></div></div></div>
+    <div class="tools"><input class="search" id="q" placeholder="جستجو: حلقه، فایل، کلاس، async ..."></div>
+    <div class="chips" id="chips"></div>
+    <div class="snips" id="snips"></div>
+  </section>
+ 
+  <section id="ai">
+    <div class="sec-title reveal"><h2>دستیار هوشمند برنامه‌نویسی</h2><p>هر سؤال مقدماتی داری بپرس؛ با مثال کد جواب می‌دهد</p><div class="divider"><div class="stairs"></div></div></div>
+    <div class="ai reveal">
+      <div class="ai-head"><span class="dot"></span><b>دستیار کدستان</b><small id="kbInfo"></small></div>
+      <div class="msgs" id="msgs"></div>
+      <div class="sugs" id="sugs"></div>
+      <form class="ask" id="askForm"><input id="askIn" autocomplete="off" placeholder="سؤالت را بنویس... مثلاً: حلقه for چیست؟"><button class="btn" type="submit">بپرس</button></form>
+    </div>
+  </section>
+ 
+  <section id="road">
+    <div class="sec-title reveal"><h2>مسیر یادگیری</h2><p>نقشه راه یک برنامه‌نویس تازه‌کار</p><div class="divider"><div class="stairs"></div></div></div>
+    <div class="road">
+      <div class="step reveal" data-n="۱"><h3>مبانی منطق و الگوریتم</h3><p>متغیر، شرط، حلقه و تابع را با پایتون یاد بگیر. هر روز یک مسئله کوچک حل کن.</p></div>
+      <div class="step reveal" data-n="۲"><h3>ابزارها</h3><p>ترمینال، ادیتور (VS Code)، گیت و گیت‌هاب؛ ابزارهایی که هر روز استفاده می‌کنی.</p></div>
+      <div class="step reveal" data-n="۳"><h3>وب: HTML، CSS و JavaScript</h3><p>اولین صفحه‌ات را بساز، ریسپانسیو کن و با جاوااسکریپت زنده‌اش کن.</p></div>
+      <div class="step reveal" data-n="۴"><h3>ساختمان داده و شیءگرایی</h3><p>لیست، دیکشنری، پشته، صف و مفهوم کلاس و شیء.</p></div>
+      <div class="step reveal" data-n="۵"><h3>بک‌اند و پایگاه داده</h3><p>API، SQL، احراز هویت و ساخت یک سرویس واقعی با Node.js یا Python.</p></div>
+      <div class="step reveal" data-n="۶"><h3>پروژه واقعی و نمونه‌کار</h3><p>۳ پروژه کامل بساز، در گیت‌هاب منتشر کن و رزومه‌ات را بنویس.</p></div>
+    </div>
+  </section>
+</main>
+ 
+<footer class="site-foot">
+  <svg viewBox="0 0 220 150" fill="none" stroke="#1de9d1" stroke-width="4" stroke-linecap="round"><circle cx="110" cy="84" r="15"/><circle cx="110" cy="40" r="9"/><path d="M110 50v20M96 76C80 70 58 70 30 64M94 88C76 86 54 90 22 88M124 76C140 70 162 70 190 64M126 88C144 86 166 90 198 88M100 104l-14 34M110 99v42M120 104l14 34"/></svg>
+  <p>کدستان؛ ساخته‌شده با عشق به کدنویسی و میراث ایران</p>
+</footer>
+ 
+<script>
+/* ============ داده‌ها ============ */
+const IC = n => 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/' + n;
+const LANGS = [
+ {id:'python', n:'Python', ic:IC('python/python-original.svg'), lv:1, yr:1991,
+  d:'ساده‌ترین زبان برای شروع. خوانا، قدرتمند و محبوب در هوش مصنوعی و تحلیل داده.',
+  u:['هوش مصنوعی','تحلیل داده','اتوماسیون','وب'], h:'print("سلام دنیا")'},
+ {id:'javascript', n:'JavaScript', ic:IC('javascript/javascript-original.svg'), lv:2, yr:1995,
+  d:'زبان وب. هم در مرورگر اجرا می‌شود و هم با Node.js در سرور.',
+  u:['وب','بک‌اند','موبایل','بازی'], h:'console.log("سلام دنیا");'},
+ {id:'typescript', n:'TypeScript', ic:IC('typescript/typescript-original.svg'), lv:2, yr:2012,
+  d:'جاوااسکریپت با نوع‌دهی ایستا؛ برای پروژه‌های بزرگ و تیمی.',
+  u:['وب','بک‌اند','کتابخانه‌ها'], h:'const msg: string = "سلام";\nconsole.log(msg);'},
+ {id:'java', n:'Java', ic:IC('java/java-original.svg'), lv:3, yr:1995,
+  d:'زبان شیءگرای پایدار برای سیستم‌های بانکی، سازمانی و اندروید.',
+  u:['سازمانی','اندروید','بک‌اند'], h:'public class Main {\n  public static void main(String[] a) {\n    System.out.println("Hello");\n  }\n}'},
+ {id:'csharp', n:'C#', ic:IC('csharp/csharp-original.svg'), lv:2, yr:2000,
+  d:'زبان مایکروسافت برای ویندوز، وب (ASP.NET) و ساخت بازی با Unity.',
+  u:['بازی (Unity)','دسکتاپ','وب'], h:'Console.WriteLine("Hello");'},
+ {id:'cpp', n:'C++', ic:IC('cplusplus/cplusplus-original.svg'), lv:3, yr:1985,
+  d:'سرعت بسیار بالا و کنترل کامل حافظه؛ برای بازی، موتورها و سیستم‌های نهفته.',
+  u:['بازی','سیستم‌عامل','نهفته'], h:'#include <iostream>\nint main(){\n  std::cout << "Hello";\n}'},
+ {id:'go', n:'Go', ic:IC('go/go-original.svg'), lv:2, yr:2009,
+  d:'زبان ساده و سریع گوگل برای سرورها و سرویس‌های ابری.',
+  u:['بک‌اند','ابری','DevOps'], h:'package main\nimport "fmt"\nfunc main(){\n  fmt.Println("Hello")\n}'},
+ {id:'rust', n:'Rust', ic:IC('rust/rust-original.svg'), lv:3, yr:2010,
+  d:'ایمنی حافظه بدون garbage collector؛ سریع و مطمئن.',
+  u:['سیستم','وب‌اسمبلی','ابزارهای CLI'], h:'fn main() {\n    println!("Hello");\n}'},
+ {id:'php', n:'PHP', ic:IC('php/php-original.svg'), lv:1, yr:1995,
+  d:'زبان قدیمی و پرکاربرد سمت سرور؛ پشت وردپرس و لاراول.',
+  u:['وب','وردپرس','فروشگاه'], h:'<?php\necho "Hello";'},
+ {id:'swift', n:'Swift', ic:IC('swift/swift-original.svg'), lv:2, yr:2014,
+  d:'زبان اپل برای ساخت اپلیکیشن iOS و macOS.',
+  u:['iOS','macOS'], h:'print("Hello")'},
+ {id:'kotlin', n:'Kotlin', ic:IC('kotlin/kotlin-original.svg'), lv:2, yr:2011,
+  d:'زبان رسمی اندروید؛ مدرن و کوتاه‌تر از جاوا.',
+  u:['اندروید','بک‌اند'], h:'fun main() {\n    println("Hello")\n}'},
+ {id:'html', n:'HTML5', ic:IC('html5/html5-original.svg'), lv:1, yr:1993,
+  d:'اسکلت هر صفحه وب. زبان نشانه‌گذاری، نه برنامه‌نویسی.',
+  u:['ساختار صفحه','ایمیل'], h:'<h1>سلام دنیا</h1>'},
+ {id:'css', n:'CSS3', ic:IC('css3/css3-original.svg'), lv:1, yr:1996,
+  d:'ظاهر صفحه: رنگ، چیدمان، انیمیشن و واکنش‌گرایی.',
+  u:['طراحی','انیمیشن','ریسپانسیو'], h:'h1 {\n  color: teal;\n}'},
+ {id:'sql', n:'SQL', ic:IC('mysql/mysql-original.svg'), lv:1, yr:1974,
+  d:'زبان پرسش از پایگاه داده. برای هر برنامه‌نویس لازم است.',
+  u:['پایگاه داده','گزارش‌گیری'], h:'SELECT "سلام" AS msg;'},
+ {id:'dart', n:'Dart', ic:IC('dart/dart-original.svg'), lv:2, yr:2011,
+  d:'زبان فلاتر؛ یک کد برای اندروید، iOS، وب و دسکتاپ.',
+  u:['موبایل (Flutter)'], h:'void main() {\n  print("Hello");\n}'}
+];
+ 
+// کدهای آماده: l=زبان، t=عنوان، v=سطح(۱ تا ۳)، c=کد
+const S = [
+ {l:'python',t:'متغیر و چاپ',v:1,c:'name = "Ali"\nage = 20\nprint(f"{name} is {age} years old")'},
+ {l:'python',t:'حلقه for و list comprehension',v:1,c:'squares = [x*x for x in range(1, 6)]\nprint(squares)  # [1, 4, 9, 16, 25]\nfor s in squares:\n    print(s)'},
+ {l:'python',t:'تابع و دیکشنری',v:1,c:'def greet(user):\n    return "Hi " + user["name"]\n\nperson = {"name": "Sara", "age": 22}\nprint(greet(person))'},
+ {l:'python',t:'خواندن فایل',v:2,c:'with open("data.txt", encoding="utf-8") as f:\n    for line in f:\n        print(line.strip())'},
+ {l:'python',t:'کلاس و شیء',v:2,c:'class Dog:\n    def __init__(self, name):\n        self.name = name\n    def bark(self):\n        return self.name + " says woof"\n\nprint(Dog("Rex").bark())'},
+ {l:'python',t:'مدیریت خطا',v:2,c:'try:\n    n = int(input("Number: "))\n    print(10 / n)\nexcept ZeroDivisionError:\n    print("Cannot divide by zero")\nexcept ValueError:\n    print("Not a number")'},
+ {l:'python',t:'درخواست HTTP',v:2,c:'import requests\n\nr = requests.get("https://api.github.com")\nprint(r.status_code)\nprint(r.json()["current_user_url"])'},
+ {l:'python',t:'مرتب‌سازی با کلید',v:2,c:'users = [("Ali", 30), ("Sara", 25), ("Reza", 28)]\nusers.sort(key=lambda u: u[1])\nprint(users)'},
+ 
+ {l:'javascript',t:'متغیر و تابع',v:1,c:'const name = "Sara";\nlet count = 0;\n\nfunction add(a, b) {\n  return a + b;\n}\nconsole.log(add(2, 3));'},
+ {l:'javascript',t:'آرایه: map و filter',v:1,c:'const nums = [1, 2, 3, 4, 5, 6];\nconst even = nums.filter(n => n % 2 === 0);\nconst doubled = even.map(n => n * 2);\nconsole.log(doubled); // [4, 8, 12]'},
+ {l:'javascript',t:'انتخاب عنصر و رویداد',v:1,c:'const btn = document.querySelector("#btn");\nbtn.addEventListener("click", () => {\n  btn.textContent = "Clicked!";\n});'},
+ {l:'javascript',t:'async / await و fetch',v:2,c:'async function getUser() {\n  try {\n    const res = await fetch("https://api.github.com/users/octocat");\n    const data = await res.json();\n    console.log(data.login);\n  } catch (e) {\n    console.error("Error:", e);\n  }\n}\ngetUser();'},
+ {l:'javascript',t:'ذخیره در localStorage',v:1,c:'localStorage.setItem("theme", "dark");\nconst theme = localStorage.getItem("theme");\nconsole.log(theme);'},
+ {l:'javascript',t:'کلاس',v:2,c:'class Counter {\n  #n = 0;\n  inc() { this.#n++; return this.#n; }\n}\nconst c = new Counter();\nconsole.log(c.inc(), c.inc());'},
+ {l:'javascript',t:'Debounce برای جستجو',v:3,c:'function debounce(fn, ms) {\n  let t;\n  return (...args) => {\n    clearTimeout(t);\n    t = setTimeout(() => fn(...args), ms);\n  };\n}\nconst onType = debounce(v => console.log(v), 300);'},
+ 
+ {l:'typescript',t:'نوع‌ها و اینترفیس',v:1,c:'interface User {\n  id: number;\n  name: string;\n  email?: string;\n}\nconst u: User = { id: 1, name: "Ali" };'},
+ {l:'typescript',t:'تابع جنریک',v:2,c:'function first<T>(arr: T[]): T | undefined {\n  return arr[0];\n}\nconsole.log(first([10, 20, 30]));'},
+ {l:'typescript',t:'Union و Type Guard',v:2,c:'type Id = number | string;\nfunction show(id: Id) {\n  if (typeof id === "string") return id.toUpperCase();\n  return id.toFixed(2);\n}'},
+ 
+ {l:'java',t:'کلاس و متد',v:1,c:'public class Car {\n  private String brand;\n  public Car(String brand) { this.brand = brand; }\n  public String info() { return "Car: " + brand; }\n  public static void main(String[] args) {\n    System.out.println(new Car("BMW").info());\n  }\n}'},
+ {l:'java',t:'ArrayList و حلقه',v:1,c:'import java.util.*;\n\npublic class Main {\n  public static void main(String[] args) {\n    List<String> names = new ArrayList<>();\n    names.add("Ali"); names.add("Sara");\n    for (String n : names) System.out.println(n);\n  }\n}'},
+ {l:'java',t:'مدیریت استثنا',v:2,c:'try {\n  int x = Integer.parseInt("abc");\n} catch (NumberFormatException e) {\n  System.out.println("Invalid number");\n} finally {\n  System.out.println("Done");\n}'},
+ 
+ {l:'csharp',t:'کلاس و property',v:1,c:'public class Person {\n    public string Name { get; set; }\n    public int Age { get; set; }\n}\nvar p = new Person { Name = "Ali", Age = 25 };\nConsole.WriteLine(p.Name);'},
+ {l:'csharp',t:'LINQ',v:2,c:'var nums = new[] {1,2,3,4,5,6};\nvar even = nums.Where(n => n % 2 == 0).Select(n => n * 10);\nConsole.WriteLine(string.Join(", ", even));'},
+ {l:'csharp',t:'حرکت در Unity',v:2,c:'using UnityEngine;\npublic class Move : MonoBehaviour {\n    public float speed = 5f;\n    void Update() {\n        float x = Input.GetAxis("Horizontal");\n        transform.Translate(x * speed * Time.deltaTime, 0, 0);\n    }\n}'},
+ 
+ {l:'cpp',t:'ورودی و خروجی',v:1,c:'#include <iostream>\nusing namespace std;\nint main() {\n    int a, b;\n    cin >> a >> b;\n    cout << "Sum = " << a + b << endl;\n    return 0;\n}'},
+ {l:'cpp',t:'وکتور و حلقه',v:1,c:'#include <iostream>\n#include <vector>\nusing namespace std;\nint main() {\n    vector<int> v = {3, 1, 2};\n    for (int x : v) cout << x << " ";\n}'},
+ {l:'cpp',t:'اشاره‌گر (Pointer)',v:3,c:'#include <iostream>\nint main() {\n    int x = 10;\n    int* p = &x;   // آدرس x\n    *p = 20;       // تغییر مقدار از طریق آدرس\n    std::cout << x; // 20\n}'},
+ 
+ {l:'go',t:'تابع و چند مقدار بازگشتی',v:1,c:'package main\nimport "fmt"\n\nfunc divide(a, b int) (int, error) {\n    if b == 0 { return 0, fmt.Errorf("divide by zero") }\n    return a / b, nil\n}\nfunc main() {\n    r, err := divide(10, 2)\n    fmt.Println(r, err)\n}'},
+ {l:'go',t:'Goroutine و Channel',v:3,c:'package main\nimport "fmt"\n\nfunc main() {\n    ch := make(chan string)\n    go func() { ch <- "hello from goroutine" }()\n    fmt.Println(<-ch)\n}'},
+ {l:'go',t:'وب‌سرور ساده',v:2,c:'package main\nimport ("fmt"; "net/http")\n\nfunc main() {\n    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {\n        fmt.Fprint(w, "Hello Web")\n    })\n    http.ListenAndServe(":8080", nil)\n}'},
+ 
+ {l:'rust',t:'Ownership و borrow',v:3,c:'fn len(s: &String) -> usize { s.len() }\n\nfn main() {\n    let s = String::from("hello");\n    println!("{}", len(&s)); // قرض گرفتن\n    println!("{}", s);       // هنوز قابل استفاده\n}'},
+ {l:'rust',t:'Option و match',v:2,c:'fn main() {\n    let v = vec![1, 2, 3];\n    match v.get(5) {\n        Some(x) => println!("{}", x),\n        None => println!("not found"),\n    }\n}'},
+ 
+ {l:'php',t:'آرایه و حلقه',v:1,c:'<?php\n$fruits = ["apple", "banana", "kiwi"];\nforeach ($fruits as $f) {\n    echo $f . "\\n";\n}'},
+ {l:'php',t:'اتصال PDO به دیتابیس',v:2,c:'<?php\n$pdo = new PDO("mysql:host=localhost;dbname=test", "user", "pass");\n$st = $pdo->prepare("SELECT * FROM users WHERE id = ?");\n$st->execute([1]);\nprint_r($st->fetch());'},
+ 
+ {l:'swift',t:'Optional و guard',v:2,c:'func greet(_ name: String?) {\n    guard let n = name else { print("No name"); return }\n    print("Hello, \\(n)")\n}\ngreet("Ali")'},
+ {l:'swift',t:'Struct',v:1,c:'struct Point {\n    var x: Double\n    var y: Double\n}\nlet p = Point(x: 1, y: 2)\nprint(p.x + p.y)'},
+ 
+ {l:'kotlin',t:'Data class',v:1,c:'data class User(val name: String, val age: Int)\n\nfun main() {\n    val u = User("Ali", 25)\n    println(u)\n    println(u.copy(age = 26))\n}'},
+ {l:'kotlin',t:'Null safety',v:2,c:'fun main() {\n    val s: String? = null\n    println(s?.length ?: 0)\n}'},
+ 
+ {l:'html',t:'اسکلت یک صفحه',v:1,c:'<!DOCTYPE html>\n<html lang="fa" dir="rtl">\n<head>\n  <meta charset="UTF-8">\n  <title>صفحه من</title>\n</head>\n<body>\n  <h1>سلام</h1>\n  <p>این اولین صفحه من است.</p>\n</body>\n</html>'},
+ {l:'html',t:'فرم ثبت‌نام',v:1,c:'<form>\n  <input type="text" name="name" placeholder="نام" required>\n  <input type="email" name="email" placeholder="ایمیل" required>\n  <button type="submit">ارسال</button>\n</form>'},
+ 
+ {l:'css',t:'وسط‌چین با Flexbox',v:1,c:'.box {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  min-height: 100vh;\n}'},
+ {l:'css',t:'انیمیشن چرخش',v:2,c:'.spin {\n  animation: rot 3s linear infinite;\n}\n@keyframes rot {\n  to { transform: rotate(360deg); }\n}'},
+ {l:'css',t:'گرید ریسپانسیو',v:2,c:'.grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));\n  gap: 16px;\n}'},
+ 
+ {l:'sql',t:'SELECT با شرط و مرتب‌سازی',v:1,c:'SELECT name, age\nFROM users\nWHERE age >= 18\nORDER BY age DESC\nLIMIT 10;'},
+ {l:'sql',t:'JOIN دو جدول',v:2,c:'SELECT o.id, u.name, o.total\nFROM orders o\nJOIN users u ON u.id = o.user_id\nWHERE o.total > 100;'},
+ {l:'sql',t:'GROUP BY و شمارش',v:2,c:'SELECT city, COUNT(*) AS total\nFROM users\nGROUP BY city\nHAVING COUNT(*) > 5;'},
+ {l:'sql',t:'ایجاد جدول و درج',v:1,c:'CREATE TABLE users (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  name VARCHAR(80) NOT NULL,\n  age INT\n);\nINSERT INTO users (name, age) VALUES ("Ali", 25);'},
+ 
+ {l:'dart',t:'کلاس و لیست',v:1,c:'class Student {\n  String name;\n  Student(this.name);\n}\nvoid main() {\n  var list = [Student("Ali"), Student("Sara")];\n  for (var s in list) print(s.name);\n}'},
+ {l:'dart',t:'ویجت ساده Flutter',v:2,c:'import "package:flutter/material.dart";\n\nvoid main() => runApp(\n  MaterialApp(home: Scaffold(\n    body: Center(child: Text("Hello Flutter")),\n  )),\n);'}
+];
+ 
+// پایگاه دانش دستیار (k = کلیدواژه‌ها)
+const KB = [
+ {k:['شروع','اول','مبتدی','از کجا','یادگیری'],a:'برای شروع: ۱) یک زبان ساده مثل پایتون انتخاب کن ۲) منطق (شرط، حلقه، تابع) را یاد بگیر ۳) هر روز یک مسئله کوچک حل کن ۴) یک پروژه ساده بساز. مسیر کامل در بخش «مسیر یادگیری» پایین صفحه است.'},
+ {k:['بهترین زبان','کدام زبان','کدوم زبان','انتخاب زبان'],a:'برای شروع پایتون (ساده و خوانا) یا جاوااسکریپت (اگر می‌خواهی سریع وب بسازی). بعد از یادگیری مفاهیم، رفتن به زبان‌های دیگر آسان می‌شود.'},
+ {k:['متغیر','variable'],a:'متغیر یک «جعبه نام‌دار» برای نگهداری مقدار است.',code:'name = "Ali"\nage = 20\nage = age + 1\nprint(name, age)'},
+ {k:['حلقه','for','while','تکرار'],a:'حلقه یک کار را چند بار تکرار می‌کند. for وقتی تعداد تکرار مشخص است و while تا وقتی شرط برقرار است.',code:'for i in range(3):\n    print(i)\n\nn = 3\nwhile n > 0:\n    print(n)\n    n -= 1'},
+ {k:['شرط','if','else','شرطی'],a:'شرط به برنامه اجازه تصمیم‌گیری می‌دهد.',code:'age = 18\nif age >= 18:\n    print("adult")\nelif age >= 13:\n    print("teen")\nelse:\n    print("child")'},
+ {k:['تابع','function','فانکشن'],a:'تابع بلوکی از کد است که اسم دارد و می‌توانی چند بار صدایش بزنی. ورودی (پارامتر) می‌گیرد و خروجی برمی‌گرداند.',code:'def area(w, h):\n    return w * h\n\nprint(area(3, 4))  # 12'},
+ {k:['کلاس','شیء','oop','شی گرایی','شیءگرایی','object'],a:'برنامه‌نویسی شیءگرا کد را به «شیء»ها تقسیم می‌کند. کلاس نقشه‌ی شیء است. چهار ستون: کپسوله‌سازی، وراثت، چندریختی، انتزاع.',code:'class Animal:\n    def __init__(self, name):\n        self.name = name\n    def speak(self):\n        return "..."\n\nclass Cat(Animal):\n    def speak(self):\n        return self.name + ": meow"\n\nprint(Cat("Mimi").speak())'},
+ {k:['آرایه','لیست','array','list'],a:'آرایه/لیست مجموعه‌ای مرتب از مقدارهاست و اندیس از صفر شروع می‌شود.',code:'fruits = ["apple", "kiwi", "pear"]\nprint(fruits[0])      # apple\nfruits.append("fig")\nprint(len(fruits))    # 4'},
+ {k:['دیکشنری','dict','شیء جاوااسکریپت','map','کلید'],a:'دیکشنری داده را به صورت «کلید: مقدار» نگه می‌دارد.',code:'user = {"name": "Ali", "age": 25}\nprint(user["name"])\nuser["city"] = "Tehran"'},
+ {k:['الگوریتم','algorithm'],a:'الگوریتم دنباله‌ای مرحله‌به‌مرحله و دقیق برای حل یک مسئله است؛ مثل دستور پخت غذا. اول الگوریتم را روی کاغذ بنویس، بعد کد کن.'},
+ {k:['گیت','git'],a:'گیت سیستم کنترل نسخه است و تاریخچه تغییرات کد را نگه می‌دارد. گیت‌هاب سایتی برای ذخیره و اشتراک پروژه‌های گیت است.',code:'git init\ngit add .\ngit commit -m "first commit"\ngit branch -M main\ngit remote add origin <URL>\ngit push -u origin main'},
+ {k:['api','ای پی آی','وب سرویس'],a:'API راهی است که دو برنامه با هم صحبت کنند. مثلاً اپ موبایل از API سرور اطلاعات می‌گیرد. معمولاً با HTTP و داده‌ی JSON کار می‌کند.'},
+ {k:['json','جیسون'],a:'JSON قالب متنی ساده برای تبادل داده است.',code:'{\n  "name": "Ali",\n  "age": 25,\n  "skills": ["python", "sql"]\n}'},
+ {k:['دیتابیس','پایگاه داده','sql','nosql','database'],a:'پایگاه داده جای ذخیره‌ی منظم اطلاعات است. SQL (مثل MySQL و PostgreSQL) جدول و رابطه دارد؛ NoSQL (مثل MongoDB) داده را انعطاف‌پذیرتر و به شکل سند ذخیره می‌کند. برای شروع SQL را یاد بگیر.'},
+ {k:['select','سلکت','کوئری','query'],a:'SELECT برای خواندن داده از جدول است.',code:'SELECT name, age\nFROM users\nWHERE age > 18\nORDER BY name;'},
+ {k:['http','متد','get','post'],a:'متدهای اصلی HTTP: GET (خواندن)، POST (ایجاد)، PUT/PATCH (ویرایش)، DELETE (حذف). کدهای وضعیت: 200 موفق، 404 پیدا نشد، 500 خطای سرور.'},
+ {k:['فرانت','بک اند','بکند','فرانت اند','frontend','backend'],a:'فرانت‌اند بخشی است که کاربر می‌بیند (HTML، CSS، JS). بک‌اند بخش پشت‌صحنه است: سرور، منطق و پایگاه داده. کسی که هر دو را بلد باشد فول‌استک است.'},
+ {k:['فریمورک','framework','ری اکت','react','vue','لاراول','django'],a:'فریمورک ساختار آماده‌ای برای ساخت پروژه است. معروف‌ها: React و Vue (فرانت)، Django و Flask (پایتون)، Express (Node)، Laravel (PHP). اول زبان را خوب یاد بگیر، بعد سراغ فریمورک برو.'},
+ {k:['بازگشتی','ریکرشن','recursion'],a:'تابع بازگشتی خودش را صدا می‌زند. حتماً به یک «شرط توقف» نیاز دارد.',code:'def fact(n):\n    if n <= 1:      # شرط توقف\n        return 1\n    return n * fact(n - 1)\n\nprint(fact(5))  # 120'},
+ {k:['بیگ او','big o','پیچیدگی','complexity'],a:'Big O سرعت رشد زمان اجرای الگوریتم را نسبت به اندازه ورودی نشان می‌دهد. O(1) ثابت، O(log n) جستجوی دودویی، O(n) پیمایش ساده، O(n²) دو حلقه تو در تو.'},
+ {k:['async','await','پرامیس','promise','ناهمزمان'],a:'کد ناهمزمان اجازه می‌دهد کارهای کند (مثل درخواست شبکه) برنامه را قفل نکنند. await منتظر نتیجه می‌ماند بدون بلاک کردن بقیه برنامه.',code:'async function load() {\n  const res = await fetch("/api/data");\n  const data = await res.json();\n  console.log(data);\n}\nload();'},
+ {k:['خطا','استثنا','try','catch','exception'],a:'با try/catch خطاها را مدیریت می‌کنی تا برنامه از کار نیفتد.',code:'try:\n    x = int("abc")\nexcept ValueError:\n    print("عدد معتبر نیست")'},
+ {k:['ترمینال','دستور','cmd','خط فرمان','bash'],a:'دستورهای پایه ترمینال: ls (لیست فایل‌ها)، cd (تغییر پوشه)، mkdir (ساخت پوشه)، cat (نمایش فایل)، rm (حذف)، pwd (مسیر فعلی). در ویندوز: dir به‌جای ls.'},
+ {k:['دیباگ','باگ','debug','خطایابی'],a:'برای دیباگ: ۱) پیام خطا را کامل بخوان ۲) مشکل را کوچک و بازتولید کن ۳) با print یا دیباگر مقدار متغیرها را ببین ۴) تغییرات را یکی‌یکی امتحان کن ۵) اگر گیر کردی، پیام خطا را جستجو کن یا از دیگران بپرس.'},
+ {k:['==','===','مساوی','برابری'],a:'در جاوااسکریپت == مقدارها را بعد از تبدیل نوع مقایسه می‌کند (مثلاً "5" == 5 درست است) اما === بدون تبدیل نوع مقایسه می‌کند. همیشه === را ترجیح بده.'},
+ {k:['let','const','var','ولد'],a:'در جاوااسکریپت: const برای مقدار ثابت، let برای مقدار قابل تغییر. از var پرهیز کن چون محدوده‌ی (scope) عجیبی دارد.'},
+ {k:['اشاره گر','pointer','اشاره‌گر','اشارهگر'],a:'اشاره‌گر متغیری است که آدرس حافظه‌ی یک متغیر دیگر را نگه می‌دارد (در C و C++). با * مقدار را می‌خوانی و با & آدرس را می‌گیری.',code:'int x = 5;\nint* p = &x;\n*p = 9;   // x حالا 9 است'},
+ {k:['جاوا و جاوااسکریپت','تفاوت جاوا','جاوا اسکریپت'],a:'این دو ربطی به هم ندارند! جاوا زبان کامپایلی و شیءگراست (سازمانی، اندروید) و جاوااسکریپت زبان وب است. فقط اسم‌هایشان مشابه است.'},
+ {k:['فلکس','flex','ریسپانسیو','responsive','وسط چین','وسط‌چین'],a:'برای وسط‌چین کردن با CSS از Flexbox استفاده کن. برای ریسپانسیو هم از واحدهای نسبی، Grid و media query استفاده کن.',code:'.box {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n}'},
+ {k:['امنیت','تزریق','injection','هک'],a:'نکات امنیتی پایه: ورودی کاربر را همیشه اعتبارسنجی کن، از query پارامتری (prepared statement) استفاده کن تا SQL Injection نشود، رمزها را هش کن (bcrypt/argon2) و کلیدهای مخفی را در کد نگذار.',code:'# امن\ncursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))\n# ناامن (هرگز)\n# cursor.execute("SELECT * FROM users WHERE id = " + user_id)'},
+ {k:['ریجکس','regex','عبارت منظم'],a:'Regex الگویی برای جستجو در متن است.',code:'import re\ntext = "تماس: 09123456789"\nprint(re.findall(r"09\\d{9}", text))'},
+ {k:['تست','test','unit'],a:'تست‌نویسی یعنی کدی بنویسی که درستی کد اصلی را خودکار بررسی کند. در پایتون با pytest شروع کن.',code:'def add(a, b):\n    return a + b\n\ndef test_add():\n    assert add(2, 3) == 5'},
+ {k:['پروژه','تمرین','ایده'],a:'ایده‌های پروژه برای تمرین: ماشین‌حساب، لیست کارها (To-Do)، بازی حدس عدد، وبلاگ ساده، ربات تلگرام، برنامه‌ی هواشناسی با API، فروشگاه ساده. هر پروژه را در گیت‌هاب بگذار.'},
+ {k:['کار','استخدام','رزومه','درآمد','شغل'],a:'برای پیدا کردن کار: ۱) حداقل ۳ پروژه‌ی واقعی در گیت‌هاب ۲) رزومه‌ی کوتاه و دقیق ۳) پروفایل لینکدین ۴) مشارکت در پروژه‌های متن‌باز ۵) آماده‌سازی برای مصاحبه (ساختمان داده + پروژه‌هایت).'},
+ {k:['هوش مصنوعی','ai','یادگیری ماشین','machine learning','ml'],a:'برای ورود به هوش مصنوعی: پایتون ← ریاضیات پایه (جبر خطی، آمار) ← numpy و pandas ← scikit-learn ← PyTorch یا TensorFlow. اول با پروژه‌های کوچک شروع کن.'},
+ {k:['داکر','docker','کانتینر'],a:'داکر برنامه را با همه‌ی وابستگی‌هایش در یک «کانتینر» بسته‌بندی می‌کند تا همه‌جا یکسان اجرا شود.',code:'FROM python:3.12-slim\nWORKDIR /app\nCOPY . .\nRUN pip install -r requirements.txt\nCMD ["python", "main.py"]'},
+ {k:['پشته','صف','stack','queue','ساختمان داده','ساختار داده'],a:'پشته (Stack): آخرین ورودی اولین خروجی (LIFO). صف (Queue): اولین ورودی اولین خروجی (FIFO). هر دو پایه‌ی بسیاری از الگوریتم‌ها هستند.',code:'stack = []\nstack.append(1); stack.append(2)\nprint(stack.pop())  # 2\n\nfrom collections import deque\nq = deque([1, 2, 3])\nprint(q.popleft())  # 1'},
+ {k:['حافظه','garbage','گاربیج','memory'],a:'در زبان‌هایی مثل پایتون، جاوا و جاوااسکریپت، Garbage Collector حافظه‌ی بلااستفاده را خودکار آزاد می‌کند. در C/C++ باید خودت مدیریتش کنی و در Rust با سیستم ownership مدیریت می‌شود.'},
+ {k:['سلام','درود','hi','hello'],a:'سلام! 👋 من دستیار کدستان هستم. هر سؤالی از مفاهیم پایه‌ی برنامه‌نویسی داری بپرس، مثلاً: «تابع چیست؟» یا «تفاوت let و const».'},
+ {k:['مرتب','sort','سورت'],a:'مرتب‌سازی در بیشتر زبان‌ها از قبل آماده است. معروف‌ترین الگوریتم‌ها: Bubble Sort (ساده ولی کند)، Merge Sort و Quick Sort (سریع).',code:'nums = [5, 2, 9, 1]\nprint(sorted(nums))                 # صعودی\nprint(sorted(nums, reverse=True))   # نزولی'}
+];
+ 
+/* ============ ابزار ============ */
+const $ = s => document.querySelector(s);
+const fa = n => String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const norm = s => s.toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\u200c\u064b-\u065f]/g,'').replace(/ة/g,'ه').trim();
+const byId = id => LANGS.find(l => l.id === id);
+const lvName = ['', 'مبتدی', 'متوسط', 'پیشرفته'];
+ 
+/* ============ ستاره و گل‌سرخی تخت‌جمشید ============ */
+function buildRosette(svg, petals, color){
+  let h = '<g fill="none" stroke="'+color+'" stroke-width="1.1">';
+  for(let i=0;i<petals;i++){
+    h += '<ellipse cx="0" cy="-27" rx="6" ry="15" transform="rotate('+(360/petals*i)+')"/>';
+    h += '<path d="M0 -44 L0 -49" transform="rotate('+(360/petals*i+180/petals)+')"/>';
+  }
+  h += '<circle r="10"/><circle r="49" stroke-opacity=".5"/><circle r="5" fill="'+color+'" fill-opacity=".3"/></g>';
+  svg.innerHTML = h;
+}
+buildRosette($('#ros1'), 12, '#1de9d1');
+buildRosette($('#ros2'), 8, '#7ff5e6');
+$('#petals').innerHTML = [0,1,2,3,4,5,6,7].map(i => '<ellipse cx="0" cy="-22" rx="5" ry="12" transform="rotate('+(i*45)+')"/>').join('');
+ 
+/* ============ کارت زبان‌ها ============ */
+function iconHTML(l){
+  return '<img src="'+l.ic+'" alt="'+l.n+'" loading="lazy" onerror="this.outerHTML=\'<span>'+l.n.slice(0,2)+'</span>\'">';
+}
+const grid = $('#langGrid');
+LANGS.forEach((l, i) => {
+  const count = S.filter(s => s.l === l.id).length;
+  const el = document.createElement('div');
+  el.className = 'lang reveal';
+  el.style.transitionDelay = (i % 6) * 70 + 'ms';
+  el.innerHTML =
+   '<div class="inner">' +
+    '<div class="face front"><div class="ico">'+iconHTML(l)+'</div><h3>'+l.n+'</h3><small>'+lvName[l.lv]+' • از '+fa(l.yr)+'</small></div>' +
+    '<div class="face back"><h4>'+l.n+'</h4><p>'+l.d+'</p>' +
+      '<div class="tags">'+l.u.map(x=>'<span class="tag">'+x+'</span>').join('')+'</div>' +
+      '<div class="lvl" title="سختی"><i style="width:'+(l.lv*33.3)+'%"></i></div>' +
+      '<pre class="mini"></pre>' +
+      '<button class="btn" data-l="'+l.id+'">'+fa(count)+' کد آماده ←</button></div>' +
+   '</div>';
+  el.querySelector('pre').textContent = l.h;
+  el.addEventListener('click', e => {
+    if(e.target.closest('button')) return;
+    el.classList.toggle('flip');
+  });
+  el.querySelector('button').addEventListener('click', () => {
+    activeLang = l.id; renderChips(); renderSnips();
+    $('#codes').scrollIntoView({behavior:'smooth'});
+  });
+  grid.appendChild(el);
+});
+ 
+/* ============ کتابخانه کد ============ */
+let activeLang = 'all', query = '';
+function renderChips(){
+  const c = $('#chips'); c.innerHTML = '';
+  [{id:'all', n:'همه'}].concat(LANGS).forEach(l => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (activeLang === l.id ? ' on' : '');
+    b.textContent = l.n;
+    b.onclick = () => { activeLang = l.id; renderChips(); renderSnips(); };
+    c.appendChild(b);
+  });
+}
+function renderSnips(){
+  const box = $('#snips'); box.innerHTML = '';
+  const q = norm(query);
+  const list = S.filter(s => (activeLang === 'all' || s.l === activeLang) &&
+     (!q || norm(s.t + ' ' + s.c + ' ' + byId(s.l).n).includes(q)));
+  if(!list.length){ box.innerHTML = '<div class="empty">کدی پیدا نشد. عبارت دیگری را امتحان کن.</div>'; return; }
+  list.forEach((s, i) => {
+    const l = byId(s.l);
+    const el = document.createElement('div');
+    el.className = 'snip'; el.style.animationDelay = Math.min(i, 12) * 40 + 'ms';
+    el.innerHTML = '<header><img src="'+l.ic+'" alt="" onerror="this.style.display=\'none\'"><b>'+s.t+'</b><em>'+lvName[s.v]+'</em></header><pre></pre>' +
+      '<footer><span>'+l.n+'</span><button class="copy">کپی</button></footer>';
+    el.querySelector('pre').textContent = s.c;
+    el.querySelector('.copy').onclick = e => copyText(s.c, e.target);
+    box.appendChild(el);
+  });
+}
+function copyText(t, btn){
+  const done = () => { const o = btn.textContent; btn.textContent = 'کپی شد ✓'; setTimeout(() => btn.textContent = o, 1400); };
+  if(navigator.clipboard && window.isSecureContext){ navigator.clipboard.writeText(t).then(done, fallback); } else fallback();
+  function fallback(){ const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){} ta.remove(); done(); }
+}
+$('#q').addEventListener('input', e => { query = e.target.value; renderSnips(); });
+renderChips(); renderSnips();
+ 
+/* ============ دستیار ============ */
+$('#kbInfo').textContent = fa(KB.length) + ' موضوع در پایگاه دانش';
+const msgs = $('#msgs');
+function addMsg(text, who, code){
+  const d = document.createElement('div'); d.className = 'm ' + who;
+  d.textContent = text;
+  if(code){ const p = document.createElement('pre'); p.textContent = code; d.appendChild(p); }
+  msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return d;
+}
+function answer(q){
+  const nq = norm(q); let best = null, score = 0;
+  KB.forEach(e => {
+    let s = 0;
+    e.k.forEach(k => { const nk = norm(k); if(nq.includes(nk)) s += nk.length > 2 ? 3 + nk.length / 10 : 1; });
+    if(s > score){ score = s; best = e; }
+  });
+  return score > 0 ? best : null;
+}
+function ask(q){
+  q = q.trim(); if(!q) return;
+  addMsg(q, 'me');
+  const t = addMsg('', 'bot'); t.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+  setTimeout(() => {
+    const r = answer(q); t.remove();
+    if(r) addMsg(r.a, 'bot', r.code);
+    else addMsg('جوابش را در پایگاه دانشم پیدا نکردم. 🤔 سؤالت را با کلیدواژه‌های ساده‌تر بپرس (مثلاً: حلقه، تابع، گیت، sql، api) یا از پیشنهادهای پایین استفاده کن.', 'bot');
+  }, 600 + Math.random() * 400);
+}
+$('#askForm').addEventListener('submit', e => { e.preventDefault(); const i = $('#askIn'); ask(i.value); i.value = ''; });
+['حلقه for چیست؟','تابع چیست؟','گیت چیست؟','تفاوت let و const','SQL چیست؟','بهترین زبان برای شروع','چطور باگ را پیدا کنم؟','Big O چیست؟'].forEach(s => {
+  const b = document.createElement('button'); b.textContent = s; b.onclick = () => ask(s); $('#sugs').appendChild(b);
+});
+addMsg('سلام! 👋 من دستیار کدستان هستم. سؤال برنامه‌نویسی‌ات را بپرس یا یکی از پیشنهادهای پایین را بزن.', 'bot');
+ 
+/* ============ شمارنده‌ها و تایپ ============ */
+function countUp(el, to){
+  let n = 0; const step = Math.max(1, Math.ceil(to / 40));
+  const t = setInterval(() => { n = Math.min(to, n + step); el.textContent = fa(n); if(n >= to) clearInterval(t); }, 30);
+}
+countUp($('#sLang'), LANGS.length); countUp($('#sCode'), S.length); countUp($('#sQA'), KB.length);
+ 
+const lines = ['print("سلام دنیا")', 'console.log("Hello, World!");', 'SELECT * FROM future;', 'fn main() { println!("کدنویسی!"); }', 'while (alive) { learn(); code(); }'];
+let li = 0, ci = 0, del = false; const typer = $('#typer');
+(function type(){
+  const cur = lines[li];
+  typer.textContent = cur.slice(0, ci);
+  if(!del && ci < cur.length){ ci++; setTimeout(type, 70); }
+  else if(!del){ del = true; setTimeout(type, 1400); }
+  else if(ci > 0){ ci--; setTimeout(type, 28); }
+  else { del = false; li = (li + 1) % lines.length; setTimeout(type, 300); }
+})();
+ 
+/* ============ نمایش با اسکرول ============ */
+const revealAll = () => document.querySelectorAll('.reveal:not(.in)').forEach(el => el.classList.add('in'));
+if('IntersectionObserver' in window){
+  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold:.05});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  setTimeout(revealAll, 2500);
+} else revealAll();
+ 
+/* ============ پس‌زمینه: نمادهای کد شناور ============ */
+const cv = $('#fx'), cx = cv.getContext('2d'); let W, H, parts = [];
+function rs(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+addEventListener('resize', rs); rs();
+const glyphs = ['{ }','</>','( )','[ ]','=>',';','&&','#','01','::','fn','*'];
+for(let i = 0; i < 38; i++) parts.push({x:Math.random()*W, y:Math.random()*H, v:.2+Math.random()*.5, s:12+Math.random()*16, g:glyphs[i % glyphs.length], a:.05+Math.random()*.13});
+(function loop(){
+  cx.clearRect(0, 0, W, H);
+  parts.forEach(p => {
+    p.y -= p.v; if(p.y < -30){ p.y = H + 30; p.x = Math.random() * W; }
+    cx.font = p.s + 'px Consolas, monospace'; cx.fillStyle = 'rgba(29,233,209,' + p.a + ')'; cx.fillText(p.g, p.x, p.y);
+  });
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
+ 
